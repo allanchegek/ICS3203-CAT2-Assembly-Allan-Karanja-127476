@@ -1,5 +1,16 @@
 **Documentation for Task 1: Control Flow and Conditional Logic**
 
+**Why Specific Jump Instructions Were Chosen:**
+
+    JZ (Jump if Zero): This instruction detects when the input number is 0, which is a specific condition requiring unique handling. It allows the program to branch to the ZERO_LABEL efficiently without additional checks.
+    JC (Jump if Carry): This instruction detects if the input number is negative, leveraging the carry flag for signed arithmetic.
+    JMP (Unconditional Jump): After handling the zero and negative cases, an unconditional jump is used for simplicity to direct program flow to the POSITIVE_LABEL.
+
+**Impact on Program Flow:**
+
+The conditional jumps ensure that each case (POSITIVE, NEGATIVE, ZERO) is handled independently and in the correct order.
+Unconditional jumps provide a clear path to the end of the program after a specific case is executed, avoiding unnecessary comparisons.
+
 **Program Overview**
 
 This program is designed to classify a given number as POSITIVE, NEGATIVE, or ZERO. It demonstrates the use of both conditional and unconditional jump instructions to manage program flow. The input number is stored in memory, and the result is output by storing the corresponding message's address into a predefined location.

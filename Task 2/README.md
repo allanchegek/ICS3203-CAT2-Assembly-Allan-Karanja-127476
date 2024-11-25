@@ -1,5 +1,21 @@
 **Documentation for Task 2: Array Manipulation with Looping and Reversal**
 
+**Step-by-Step Reversal Process (With Comments in Code):**
+1. Initialize two pointers:
+2. H-L to the first element of the array.
+3. D-E to the last element of the array.
+4. Load the value at the H-L pointer into a temporary register (C).
+5. Load the value at the D-E pointer into the accumulator and store it at the H-L pointer.
+6. Move the value in C (original first element) to the D-E pointer.
+7. Increment the H-L pointer and decrement the D-E pointer.
+8. Compare the pointers. If they overlap or cross, the reversal is complete; otherwise, repeat the process.
+
+**Challenges with Handling Memory Directly:**
+
+Pointer Management: Ensuring pointers are adjusted correctly without exceeding array bounds was critical.
+Temporary Storage: Using registers efficiently for temporary storage of array values minimized the need for additional memory.
+Memory Constraints: Direct in-place reversal avoided the need for extra memory but required careful synchronization of read/write operations.
+
 **Program Overview**
 
 This program reverses an array of integers stored in memory, directly modifying the values in place without using additional memory. The array is located at 2050H, and its length is 5.

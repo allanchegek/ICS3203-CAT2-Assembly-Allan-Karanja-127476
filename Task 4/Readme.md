@@ -1,4 +1,20 @@
-Documentation for Task 4: Data Monitoring and Control
+**Documentation for Task 4: Data Monitoring and Control**
+
+**How the Program Determines Actions Based on Sensor Input:**
+
+1. Sensor Input Evaluation:
+    The sensor value is read from memory location 2050H and compared with predefined thresholds (50H for high and 30H for moderate).
+    Comparisons are performed using the CPI instruction, which sets flags based on the result.
+
+2. Action Selection:
+    **High Level**: If the sensor value exceeds 50H, the program sets an "alarm" by writing a value to 3100H.
+    **Moderate Level**: If the sensor value is between 30H and 50H, the program turns on the "motor" by setting a bit in 3000H.
+    **Low Level**: If the sensor value is below 30H, the program stops the motor by clearing the corresponding bit in memory.
+
+3. Memory Manipulation:
+    Alarm: Writing to 3100H reflects the alarm's active state.
+    Motor: Writing or clearing values in 3000H directly manipulates the motor's state.
+
 **Program Overview**
 
 This program simulates a simple monitoring and control system for a "water level sensor." It reads a sensor value from memory and triggers specific actions based on predefined thresholds:
