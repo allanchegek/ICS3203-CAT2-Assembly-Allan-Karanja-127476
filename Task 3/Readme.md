@@ -1,6 +1,6 @@
 Sure, here is the documentation with the specified titles for the 8085 assembly program that calculates the factorial of a given number:
 
-## **8085 Assembly Language Program Documentation: Factorial Calculation**
+## **Factorial Calculation**
 
 ### **Program Overview**
 
