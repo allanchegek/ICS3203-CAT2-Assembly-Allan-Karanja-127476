@@ -9,7 +9,7 @@ This program demonstrates how to classify a user-entered integer as **"POSITIVE"
 ---
 
 ## **Program Details**
-- **File Name:** `control_flow.asm`
+- **File Name:** `task1.asm`
 - **Platform:** 64-bit Linux (x86-64 architecture)
 - **Purpose:** 
   - Prompt the user for an integer.
@@ -27,11 +27,11 @@ This program demonstrates how to classify a user-entered integer as **"POSITIVE"
 
 ## **Compiling and Running the Program**
 ### **Steps to Run**
-1. Open a terminal and navigate to the directory containing `control_flow.asm`.
+1. Open a terminal and navigate to the directory containing `task1.asm`.
 
 2. Assemble the program:
    ```bash
-   nasm -f elf64 control_flow.asm
+   nasm -f elf64 task1.asm
    ```
 
 3. Link the object file to create an executable:
