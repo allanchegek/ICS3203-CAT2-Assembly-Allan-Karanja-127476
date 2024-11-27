@@ -78,7 +78,6 @@ factorial_done:
 
 print_number:
     ; Print number in RAX
-    xor rbx, rbx            ; Clear RBX (divisor)
     mov rbx, 10             ; Set divisor to 10
     xor rcx, rcx            ; Clear RCX (digit counter)
 print_loop:
@@ -92,8 +91,8 @@ print_loop:
 print_digits:
     pop rdx                 ; Pop digit from stack (use RDX for consistency)
     add dl, '0'             ; Convert to ASCII (DL is the lower byte of RDX)
-    mov [rsp-1], dl         ; Store the ASCII character in memory (to be printed)
     mov rsi, rsp            ; Set RSI to point to the character
+    mov [rsi-1], dl         ; Store the ASCII character in memory (to be printed)
     mov rax, 1              ; syscall: write
     mov rdi, 1              ; file descriptor: stdout
     mov rdx, 1              ; Write 1 byte
