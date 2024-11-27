@@ -71,5 +71,12 @@ This program demonstrates array manipulation in x86 32-bit assembly, focusing on
 Original Array: 1, 2, 3, 4, 5
 Reversed Array: 5, 4, 3, 2, 1
 ```
+## **Challenges and Insights**
+1. **Syscalls for Output**:
+   - Relies on Linux system calls for printing arrays to the console.
 
----
+2. **In-Place Reversal**:
+   - Efficiently manipulates memory without using extra space.
+
+3. **32-bit Constraints**:
+   - The program strictly adheres to 64-bit architecture, utilizing Linux syscalls and 64-bit registers for processing.

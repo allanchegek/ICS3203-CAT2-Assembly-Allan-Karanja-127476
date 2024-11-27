@@ -1,3 +1,7 @@
+Here’s a sample **README.md** file for the **Control Flow and Conditional Logic** task:
+
+---
+
 # Control Flow and Conditional Logic (64-bit Assembly)
 
 This program demonstrates how to classify a user-entered integer as **"POSITIVE"**, **"NEGATIVE"**, or **"ZERO"** using branching logic in x86-64 assembly. It employs conditional and unconditional jumps to effectively manage program flow.
@@ -94,3 +98,13 @@ ZERO
 ```
 
 ---
+
+## **Challenges and Insights**
+1. **ASCII to Integer Conversion**:
+   - User input is read as ASCII characters and converted to integers by subtracting the ASCII value of `'0'` (48 in decimal).
+
+2. **Branching Logic**:
+   - `je` and `jl` ensure the correct classification based on comparison results.
+
+3. **64-bit Constraints**:
+   - The program strictly adheres to 64-bit architecture, utilizing Linux syscalls and 64-bit registers for processing.
