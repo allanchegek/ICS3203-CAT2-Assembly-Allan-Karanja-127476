@@ -1,10 +1,11 @@
 section .data
-    prompt db "Enter 5 integers separated by space: ", 0
-    output_msg db "Reversed array: ", 0
+    prompt db "Enter a number: ", 0
+    result_msg db "Factorial is: ", 0
     newline db 10, 0
 
 section .bss
-    array resb 20       ; reserve space for 5 integers (4 bytes each)
+    num resb 4
+    result resq 1          ; space for result
 
 section .text
     global _start
@@ -14,77 +15,40 @@ _start:
     mov rax, 1           ; syscall: write
     mov rdi, 1           ; file descriptor: stdout
     mov rsi, prompt      ; message address
-    mov rdx, 34          ; message length
+    mov rdx, 16          ; message length
     syscall
 
     ; Read user input
     mov rax, 0           ; syscall: read
     mov rdi, 0           ; file descriptor: stdin
-    mov rsi, array       ; buffer address
-    mov rdx, 20          ; buffer size
+    mov rsi, num         ; buffer address
+    mov rdx, 4           ; buffer size
     syscall
 
-    ; Convert ASCII values to integers
-    lea rsi, [array]     ; pointer to start of array
-    xor rdi, rdi         ; index for array
-convert_input:
-    cmp byte [rsi], 10   ; check for newline
-    je reverse_loop      ; if newline, proceed to reverse loop
-    cmp byte [rsi], 32   ; check for space
-    je skip_space
-    sub byte [rsi], 48   ; convert ASCII to integer
-    movzx eax, byte [rsi]
-    mov [array + rdi * 4], eax
-    inc rdi
-skip_space:
-    inc rsi
-    jmp convert_input
+    ; Convert input to integer
+    mov rax, [num]       ; load input into rax
+    sub rax, 48          ; convert ASCII to integer
+    mov rdi, rax         ; store input in rdi (argument for factorial)
 
-reverse_loop:
-    ; Initialize pointers for reversal
-    mov rsi, array         ; start of array
-    mov rdi, array + 16    ; end of array (5 integers, each 4 bytes)
+    ; Call factorial subroutine
+    call factorial
 
-reverse_loop_start:
-    cmp rsi, rdi           ; check if pointers meet or cross
-    jge print_array
-
-    ; Swap elements
-    mov eax, [rsi]         ; load element from start
-    mov ebx, [rdi]         ; load element from end
-    mov [rsi], ebx         ; store end element at start
-    mov [rdi], eax         ; store start element at end
-
-    ; Move pointers
-    add rsi, 4
-    sub rdi, 4
-    jmp reverse_loop_start
-
-print_array:
-    ; Print output message
+    ; Print result message
     mov rax, 1
     mov rdi, 1
-    mov rsi, output_msg
-    mov rdx, 16
+    mov rsi, result_msg
+    mov rdx, 15
     syscall
 
-    ; Print reversed array
-    lea rsi, [array]
-    xor rdi, rdi           ; index for array
-print_loop:
-    mov eax, [rsi]
-    add eax, 48            ; convert integer to ASCII
-    mov [array + rdi], al  ; store ASCII character
-    mov rax, 1             ; syscall: write
-    mov rdi, 1             ; file descriptor: stdout
-    lea rsi, [array + rdi] ; address of character
-    mov rdx, 1             ; write 1 character
+    ; Print result
+    mov rax, [result]    ; load result
+    add rax, 48          ; convert to ASCII
+    mov [num], al        ; store as character
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, num
+    mov rdx, 1
     syscall
-
-    add rsi, 4
-    inc rdi
-    cmp rdi, 5
-    jl print_loop
 
     ; Print newline
     mov rax, 1
@@ -94,6 +58,16 @@ print_loop:
     syscall
 
     ; Exit program
-    mov rax, 60            ; syscall: exit
-    xor rdi, rdi           ; exit code
+    mov rax, 60
+    xor rdi, rdi
     syscall
+
+factorial:
+    cmp rdi, 1
+    jle end_factorial    ; if rdi <= 1, return
+    imul rax, rdi        ; multiply rax by rdi
+    dec rdi              ; decrement rdi
+    call factorial       ; recursive call
+end_factorial:
+    mov [result], rax    ; store result in memory
+    ret

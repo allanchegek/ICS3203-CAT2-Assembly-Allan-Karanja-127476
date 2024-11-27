@@ -1,73 +1,99 @@
 section .data
-    prompt db "Enter a number: ", 0
-    result_msg db "Factorial is: ", 0
+    prompt db "Enter a positive integer: ", 0
+    result_msg db "Factorial: ", 0
     newline db 10, 0
 
 section .bss
-    num resb 4
-    result resq 1          ; space for result
+    number resb 1         ; Store user input number (1 byte)
+    factorial resq 1      ; Store the factorial result (8 bytes for large results)
 
 section .text
     global _start
 
 _start:
-    ; Prompt user
-    mov rax, 1           ; syscall: write
-    mov rdi, 1           ; file descriptor: stdout
-    mov rsi, prompt      ; message address
-    mov rdx, 16          ; message length
+    ; Prompt user for input
+    mov rax, 1             ; syscall: write
+    mov rdi, 1             ; file descriptor: stdout
+    mov rsi, prompt        ; message address
+    mov rdx, 25            ; message length
     syscall
 
     ; Read user input
-    mov rax, 0           ; syscall: read
-    mov rdi, 0           ; file descriptor: stdin
-    mov rsi, num         ; buffer address
-    mov rdx, 4           ; buffer size
+    mov rax, 0             ; syscall: read
+    mov rdi, 0             ; file descriptor: stdin
+    mov rsi, number        ; buffer address
+    mov rdx, 1             ; read 1 character
     syscall
 
-    ; Convert input to integer
-    mov rax, [num]       ; load input into rax
-    sub rax, 48          ; convert ASCII to integer
-    mov rdi, rax         ; store input in rdi (argument for factorial)
+    ; Convert ASCII input to integer
+    movzx rbx, byte [number] ; Load input into RBX and zero-extend
+    sub rbx, 48             ; Convert ASCII to integer
+
+    ; Initialize factorial result to 1
+    mov rax, 1
+    mov [factorial], rax
 
     ; Call factorial subroutine
-    call factorial
+    mov rdi, rbx           ; Pass input number in RDI
+    call factorial_calc    ; Call subroutine
 
     ; Print result message
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, result_msg
-    mov rdx, 15
+    mov rax, 1             ; syscall: write
+    mov rdi, 1             ; file descriptor: stdout
+    mov rsi, result_msg    ; message address
+    mov rdx, 10            ; message length
     syscall
 
-    ; Print result
-    mov rax, [result]    ; load result
-    add rax, 48          ; convert to ASCII
-    mov [num], al        ; store as character
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, num
-    mov rdx, 1
-    syscall
+    ; Print factorial result
+    mov rax, [factorial]   ; Load result
+    call print_number      ; Print the result
 
     ; Print newline
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, newline
-    mov rdx, 1
+    mov rax, 1             ; syscall: write
+    mov rdi, 1             ; file descriptor: stdout
+    mov rsi, newline       ; message address
+    mov rdx, 1             ; message length
     syscall
 
     ; Exit program
-    mov rax, 60
-    xor rdi, rdi
+    mov rax, 60            ; syscall: exit
+    xor rdi, rdi           ; exit code
     syscall
 
-factorial:
-    cmp rdi, 1
-    jle end_factorial    ; if rdi <= 1, return
-    imul rax, rdi        ; multiply rax by rdi
-    dec rdi              ; decrement rdi
-    call factorial       ; recursive call
-end_factorial:
-    mov [result], rax    ; store result in memory
+factorial_calc:
+    ; Calculate factorial (RDI contains input number)
+    cmp rdi, 1             ; If number <= 1, return
+    jle factorial_done
+
+    ; Recursive factorial calculation
+    mov rax, [factorial]   ; Load current factorial result
+    mul rdi                ; Multiply RAX by RDI (RAX *= RDI)
+    mov [factorial], rax   ; Store the updated result
+
+    dec rdi                ; Decrement RDI
+    call factorial_calc    ; Recursive call
+
+factorial_done:
+    ret                    ; Return to caller
+
+print_number:
+    ; Print number in RAX
+    xor rcx, rcx           ; Clear RCX (digit counter)
+print_loop:
+    xor rdx, rdx           ; Clear RDX (remainder)
+    div rbx                ; Divide RAX by 10, result in RAX, remainder in RDX
+    push rdx               ; Push remainder onto stack
+    inc rcx                ; Increment digit counter
+    test rax, rax          ; Check if quotient is 0
+    jnz print_loop         ; If not, continue dividing
+
+print_digits:
+    pop rax                ; Pop digit from stack
+    add rax, 48            ; Convert to ASCII
+    mov rsi, rax           ; Prepare for syscall
+    mov rax, 1             ; syscall: write
+    mov rdi, 1             ; file descriptor: stdout
+    mov rdx, 1             ; Write 1 byte
+    syscall
+    loop print_digits      ; Repeat for all digits
     ret
