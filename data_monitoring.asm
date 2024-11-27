@@ -1,65 +1,84 @@
 section .data
-    sensor_value db 50            ; Simulate the water level sensor (0-100, example value)
-    motor_control db 0            ; Motor status (0 = OFF, 1 = ON)
-    alarm_status db 0             ; Alarm status (0 = OFF, 1 = ON)
-    message_motor_on db "Motor ON", 0
-    message_motor_off db "Motor OFF", 0
-    message_alarm_on db "ALARM: Water level too high!", 0
-    message_alarm_off db "Alarm OFF", 0
+    sensor_value db 0            ; Simulated sensor value (e.g., water level)
+    motor_status db 0            ; Motor status: 0 = off, 1 = on
+    alarm_status db 0            ; Alarm status: 0 = off, 1 = triggered
+    high_threshold db 7          ; Threshold for triggering the alarm
+    low_threshold db 3           ; Threshold for turning on the motor
+    prompt_msg db 'Enter sensor value (0-9): ', 0  ; Prompt for user input
+    prompt_len equ $ - prompt_msg
+    motor_on_msg db 'Motor turned ON', 10, 0       ; Motor on message
+    motor_on_len equ $ - motor_on_msg
+    motor_off_msg db 'Motor turned OFF', 10, 0     ; Motor off message
+    motor_off_len equ $ - motor_off_msg
+    alarm_msg db 'ALARM TRIGGERED!', 10, 0         ; Alarm triggered message
+    alarm_len equ $ - alarm_msg
+
+section .bss
+    input resb 2  ; Buffer for user input
 
 section .text
     global _start
 
 _start:
-    ; Step 1: Read the water level sensor value (simulate input)
-    mov al, [sensor_value]       ; Load the sensor value into register AL
+    ; Step 1: Print prompt message
+    mov eax, 4                   ; Syscall: write
+    mov ebx, 1                   ; File descriptor: stdout
+    mov ecx, prompt_msg          ; Address of the prompt message
+    mov edx, prompt_len          ; Length of the prompt message
+    int 0x80                     ; Call kernel to print prompt
 
-    ; Step 2: Evaluate the sensor value and take actions
-    cmp al, 30                   ; Check if water level is less than or equal to 30
-    jle motor_on                 ; If yes, turn on motor (low water level)
+    ; Step 2: Read input from user
+    mov eax, 3                   ; Syscall: read
+    mov ebx, 0                   ; File descriptor: stdin
+    mov ecx, input               ; Address of the input buffer
+    mov edx, 2                   ; Number of bytes to read (input + newline)
+    int 0x80                     ; Call kernel to read input
 
-    cmp al, 70                   ; Check if water level is greater than 70
-    jge alarm_on                 ; If yes, trigger alarm (high water level)
+    ; Step 3: Convert input to integer and store as sensor value
+    movzx eax, byte [input]      ; Get first byte (sensor input)
+    sub eax, '0'                 ; Convert ASCII to integer
+    mov [sensor_value], al       ; Store sensor value
 
-    ; Step 3: Moderate water level (stop motor)
-    jmp motor_off                ; If neither condition is true, stop the motor
+    ; Step 4: Control logic based on sensor value
+    mov al, [sensor_value]       ; Load sensor value into al
+    cmp al, [high_threshold]     ; Compare with high threshold (7)
+    jg trigger_alarm             ; If greater, trigger alarm
 
-motor_on:
-    ; Turn on the motor
-    mov byte [motor_control], 1  ; Set motor_control to 1 (motor ON)
-    mov eax, 4                   ; sys_write
-    mov ebx, 1                   ; stdout
-    mov ecx, message_motor_on    ; Message to print
-    mov edx, 10                  ; Length of message
-    int 0x80                     ; Call kernel to print
-    jmp _start                   ; Repeat the process
+    cmp al, [low_threshold]      ; Compare with low threshold (3)
+    jl turn_on_motor             ; If less, turn on motor
 
-motor_off:
+turn_off_motor:
     ; Turn off the motor
-    mov byte [motor_control], 0  ; Set motor_control to 0 (motor OFF)
-    mov eax, 4                   ; sys_write
-    mov ebx, 1                   ; stdout
-    mov ecx, message_motor_off   ; Message to print
-    mov edx, 11                  ; Length of message
-    int 0x80                     ; Call kernel to print
-    jmp _start                   ; Repeat the process
+    mov byte [motor_status], 0   ; Motor OFF
+    mov eax, 4                   ; Syscall: write
+    mov ebx, 1                   ; File descriptor: stdout
+    mov ecx, motor_off_msg       ; Address of motor OFF message
+    mov edx, motor_off_len       ; Length of motor OFF message
+    int 0x80                     ; Call kernel to print message
+    jmp exit_program             ; Exit program
 
-alarm_on:
+turn_on_motor:
+    ; Turn on the motor
+    mov byte [motor_status], 1   ; Motor ON
+    mov eax, 4                   ; Syscall: write
+    mov ebx, 1                   ; File descriptor: stdout
+    mov ecx, motor_on_msg        ; Address of motor ON message
+    mov edx, motor_on_len        ; Length of motor ON message
+    int 0x80                     ; Call kernel to print message
+    jmp exit_program             ; Exit program
+
+trigger_alarm:
     ; Trigger the alarm
-    mov byte [alarm_status], 1   ; Set alarm_status to 1 (alarm ON)
-    mov eax, 4                   ; sys_write
-    mov ebx, 1                   ; stdout
-    mov ecx, message_alarm_on    ; Message to print
-    mov edx, 28                  ; Length of message
-    int 0x80                     ; Call kernel to print
-    jmp _start                   ; Repeat the process
+    mov byte [alarm_status], 1   ; Alarm triggered
+    mov eax, 4                   ; Syscall: write
+    mov ebx, 1                   ; File descriptor: stdout
+    mov ecx, alarm_msg           ; Address of alarm message
+    mov edx, alarm_len           ; Length of alarm message
+    int 0x80                     ; Call kernel to print message
+    jmp exit_program             ; Exit program
 
-alarm_off:
-    ; Turn off the alarm
-    mov byte [alarm_status], 0   ; Set alarm_status to 0 (alarm OFF)
-    mov eax, 4                   ; sys_write
-    mov ebx, 1                   ; stdout
-    mov ecx, message_alarm_off   ; Message to print
-    mov edx, 12                  ; Length of message
-    int 0x80                     ; Call kernel to print
-    jmp _start                   ; Repeat the process
+exit_program:
+    ; Exit program
+    mov eax, 1                   ; Syscall: exit
+    xor ebx, ebx                 ; Exit code 0
+    int 0x80                     ; Call kernel to exit
