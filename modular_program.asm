@@ -85,17 +85,18 @@ print_loop:
     xor rdx, rdx            ; Clear RDX (remainder)
     div rbx                 ; Divide RAX by 10, quotient in RAX, remainder in RDX
     add dl, '0'             ; Convert remainder to ASCII
-    dec rsi                 ; Move to the next position on stack
-    mov [rsi], dl           ; Store ASCII character
+    push rdx                ; Push remainder onto stack as ASCII character
     inc rcx                 ; Increment digit counter
     test rax, rax           ; Check if quotient is 0
     jnz print_loop          ; If not, continue dividing
 
 print_digits:
+    pop rdx                 ; Pop digit from stack (use RDX for consistency)
+    mov [rsp-1], dl         ; Store the ASCII character in memory (to be printed)
+    mov rsi, rsp            ; Set RSI to point to the character
     mov rax, 1              ; syscall: write
     mov rdi, 1              ; file descriptor: stdout
     mov rdx, 1              ; Write 1 byte
-    lodsb                   ; Load byte at RSI into AL
     syscall
     loop print_digits       ; Repeat for all digits
     ret
