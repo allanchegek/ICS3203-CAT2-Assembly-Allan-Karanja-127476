@@ -67,7 +67,7 @@ factorial_calc:
 
     ; Recursive factorial calculation
     mov rax, [factorial]    ; Load current factorial result
-    imul rax, rax, rdi      ; Multiply RAX by RDI (RAX *= RDI)
+    imul rax, rdi           ; Multiply RAX by RDI (RAX *= RDI)
     mov [factorial], rax    ; Store the updated result
 
     dec rdi                 ; Decrement RDI
