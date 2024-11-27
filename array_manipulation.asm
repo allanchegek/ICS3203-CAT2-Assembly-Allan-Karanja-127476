@@ -90,9 +90,10 @@ print_loop:
     jnz print_loop          ; If not, continue dividing
 
 print_digits:
-    pop rax                 ; Pop digit from stack
-    add rax, '0'            ; Convert to ASCII
-    mov rsi, rax            ; Prepare for syscall
+    pop rdx                 ; Pop digit from stack (use RDX for consistency)
+    add dl, '0'             ; Convert to ASCII (DL is the lower byte of RDX)
+    mov [rsp-1], dl         ; Store the ASCII character in memory (to be printed)
+    mov rsi, rsp            ; Set RSI to point to the character
     mov rax, 1              ; syscall: write
     mov rdi, 1              ; file descriptor: stdout
     mov rdx, 1              ; Write 1 byte
