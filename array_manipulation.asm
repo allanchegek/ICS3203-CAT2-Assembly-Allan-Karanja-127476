@@ -1,57 +1,104 @@
 section .data
-    prompt db "Enter a number: ", 0
-    pos_msg db "POSITIVE", 0
-    neg_msg db "NEGATIVE", 0
-    zero_msg db "ZERO", 0
+    prompt1 db "Enter 5 integers separated by spaces: ", 0
+    prompt2 db "Reversed array: ", 0
+    buffer db 20 ; Input buffer for user input (enough to hold 5 integers and spaces)
+    array dd 5 dup(0) ; Space for 5 integers (4 bytes each)
 
 section .bss
-    num resb 4
+    temp resd 1 ; Temporary variable for swapping
 
 section .text
     global _start
 
 _start:
-    ; Prompt the user
-    mov rax, 1           ; syscall: write
-    mov rdi, 1           ; file descriptor: stdout
-    mov rsi, prompt      ; message address
-    mov rdx, 14          ; message length
-    syscall
+    ; Step 1: Prompt the user for input
+    mov eax, 4           ; sys_write
+    mov ebx, 1           ; stdout
+    mov ecx, prompt1     ; Address of prompt
+    mov edx, 34          ; Length of prompt
+    int 0x80             ; Call kernel
 
-    ; Read input
-    mov rax, 0           ; syscall: read
-    mov rdi, 0           ; file descriptor: stdin
-    mov rsi, num         ; buffer address
-    mov rdx, 4           ; buffer size
-    syscall
+    ; Step 2: Read user input
+    mov eax, 3           ; sys_read
+    mov ebx, 0           ; stdin
+    mov ecx, buffer      ; Address to store input
+    mov edx, 20          ; Max input length
+    int 0x80             ; Call kernel
 
-    ; Convert input to integer
-    mov rax, [num]       ; load input into rax
-    sub rax, 48          ; convert ASCII to integer
+    ; Step 3: Convert user input into integers and store in array
+    mov esi, buffer      ; Point to input buffer
+    mov edi, array       ; Point to the array
 
-    ; Conditional logic
-    cmp rax, 0
-    je zero              ; jump if zero
-    jl negative          ; jump if less than zero
+    mov ecx, 5           ; We expect 5 integers
+parse_input:
+    ; Skip whitespace
+    cmp byte [esi], ' '
+    je skip_space
+    ; Convert ASCII to integer
+    mov eax, 0           ; Clear eax for new number
+parse_digit:
+    cmp byte [esi], '0'  ; Check if current character is a digit
+    jb store_num         ; If below '0', stop
+    cmp byte [esi], '9'
+    ja store_num         ; If above '9', stop
+    sub byte [esi], '0'  ; Convert ASCII digit to integer
+    imul eax, eax, 10    ; Shift previous digits left
+    add eax, byte [esi]  ; Add current digit to eax
+    inc esi              ; Move to the next character
+    jmp parse_digit
+store_num:
+    mov [edi], eax       ; Store the number in the array
+    add edi, 4           ; Move to the next array element
+    loop parse_input     ; Repeat for all 5 integers
+skip_space:
+    inc esi
+    jmp parse_input
 
-positive:
-    mov rsi, pos_msg
-    jmp print_message
+    ; Step 4: Reverse the array in place
+    mov esi, array       ; Start of the array
+    add esi, 16          ; End of the array (4 bytes * 4)
+    mov edi, array       ; Start of the array
 
-negative:
-    mov rsi, neg_msg
-    jmp print_message
+reverse_loop:
+    cmp esi, edi         ; Check if pointers have crossed
+    jbe reverse_done     ; If so, reversal is complete
 
-zero:
-    mov rsi, zero_msg
+    ; Swap the values at esi and edi
+    mov eax, [esi]       ; Load the value at the end
+    mov [temp], eax      ; Store it in temp
+    mov eax, [edi]       ; Load the value at the start
+    mov [esi], eax       ; Move it to the end
+    mov eax, [temp]      ; Load the temp value
+    mov [edi], eax       ; Move it to the start
 
-print_message:
-    mov rax, 1
-    mov rdi, 1
-    mov rdx, 8           ; length of message
-    syscall
+    ; Update pointers
+    sub esi, 4           ; Move esi backward
+    add edi, 4           ; Move edi forward
+    jmp reverse_loop     ; Repeat until pointers meet or cross
 
-    ; Exit program
-    mov rax, 60          ; syscall: exit
-    xor rdi, rdi         ; return code: 0
-    syscall
+reverse_done:
+    ; Step 5: Output the reversed array
+    mov eax, 4           ; sys_write
+    mov ebx, 1           ; stdout
+    mov ecx, prompt2     ; Address of reversed prompt
+    mov edx, 16          ; Length of reversed prompt
+    int 0x80             ; Call kernel
+
+    ; Print each integer
+    mov esi, array       ; Start of the array
+    mov ecx, 5           ; Number of integers to print
+print_loop:
+    mov eax, [esi]       ; Load the integer
+    call print_integer   ; Print it
+    add esi, 4           ; Move to the next integer
+    loop print_loop      ; Repeat for all integers
+
+    ; Step 6: Exit program
+    mov eax, 1           ; sys_exit
+    xor ebx, ebx         ; Exit code 0
+    int 0x80             ; Call kernel
+
+; Helper: Print a single integer
+print_integer:
+    ; Convert integer to string and print (not shown here for brevity)
+    ret
