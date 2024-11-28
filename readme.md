@@ -1,6 +1,7 @@
-**KINDLY NOTE, task1 and task2 64 bit while task3 and task4 are 32bit, copy paste documentation commands in file**
----
 ### **Documentation Requirement Answers**
+
+
+**KINDLY NOTE, task1 and task2 are 64- bit while task3 and task4 are 32-bit, copy paste documentation commands in files**
 ### **1. Control Flow and Conditional Logic**
 
 **Documentation Requirement:**  
