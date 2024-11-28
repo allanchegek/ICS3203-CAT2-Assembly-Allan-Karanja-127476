@@ -1,5 +1,5 @@
 section .data
-    prompt_msg db 'Enter a number (1-8): '  ; Message prompting the user for input
+    prompt_msg db 'Enter a number (1-9): '  ; Message prompting the user for input
     prompt_len equ $ - prompt_msg  ; Length of the prompt message
     result_msg1 db 'The factorial of:', 10  ; First message line, followed by a newline
     result_len1 equ $ - result_msg1  ; Length of the first result message
