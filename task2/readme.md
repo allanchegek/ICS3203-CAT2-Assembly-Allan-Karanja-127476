@@ -46,7 +46,24 @@ nasm -f elf64 task2.asm -o task2.o
    ```bash
    ./task2
    ```
+## **Compiling and Running the Program**
+### **Steps to Run**
+1. Open a terminal and navigate to the directory containing `task2.asm`.
 
+2. Assemble the program:
+   ```bash
+   nasm -f elf64 task2.asm task2.o
+   ```
+
+3. Link the object file to create an executable:
+   ```bash
+   ld -o task2 task2.o
+   ```
+
+4. Run the program:
+   ```bash
+   ./task2
+   ```
 ---
 
 ## **How the Program Works**
