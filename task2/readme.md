@@ -32,12 +32,13 @@ This program demonstrates array manipulation in x86 64-bit assembly, focusing on
 
 2. Assemble the program:
    ```bash
-   nasm -f elf64 task2.asm
+   Bash
+nasm -f elf64 task2.asm -o task2.o
    ```
 
 3. Link the object file to create an executable:
    ```bash
-   ld -m elf_i386 -o task2 task2.o
+   ld task2.o -o task2
    ```
 
 4. Run the program:
