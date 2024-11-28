@@ -38,6 +38,7 @@ nasm -f elf64 task2.asm -o task2.o
 
 3. Link the object file to create an executable:
    ```bash
+   Bash
    ld task2.o -o task2
    ```
 
