@@ -3,15 +3,15 @@
 
 ---
 
-# Array Manipulation with Looping and Reversal (32-bit Assembly)
+# Array Manipulation with Looping and Reversal (64-bit Assembly)
 
-This program demonstrates array manipulation in x86 32-bit assembly, focusing on looping through the elements of an array and reversing it in-place.
+This program demonstrates array manipulation in x86 64-bit assembly, focusing on looping through the elements of an array and reversing it in-place.
 
 ---
 
 ## **Program Details**
 - **File Name:** `task2.asm`
-- **Platform:** 32-bit Linux (x86 architecture)
+- **Platform:** 64-bit Linux (x86 architecture)
 - **Purpose:**
   - Traverse an integer array using a loop.
   - Reverse the array in-place using index-based swapping.
@@ -22,7 +22,7 @@ This program demonstrates array manipulation in x86 32-bit assembly, focusing on
 ## **Prerequisites**
 1. **Assembler:** [NASM](https://nasm.us/) (Netwide Assembler)
 2. **Linker:** `ld` (part of GNU Binutils)
-3. **Environment:** A 32-bit Linux system or a 64-bit Linux system with `libc6-i386` for compatibility.
+3. **Environment:** A 64-bit Linux system or a 64-bit Linux system with `libc6-i386` for compatibility.
 
 ---
 
@@ -32,7 +32,7 @@ This program demonstrates array manipulation in x86 32-bit assembly, focusing on
 
 2. Assemble the program:
    ```bash
-   nasm -f elf32 task2.asm
+   nasm -f elf64 task2.asm
    ```
 
 3. Link the object file to create an executable:
@@ -48,12 +48,8 @@ This program demonstrates array manipulation in x86 32-bit assembly, focusing on
 ---
 
 ## **How the Program Works**
-1. The program initializes an integer array in memory.
-2. Loops through the array to print its elements.
-3. Reverses the array in-place using two-pointer swapping:
-   - The first pointer starts at the beginning of the array.
-   - The second pointer starts at the end and decrements.
-4. Displays the reversed array to the user.
+1. This program accepts an array of 5 single-digit integers from the user,
+2. It reverses the array in place using two-pointer logic, and outputs the reversed array.
 
 ---
 
@@ -78,5 +74,5 @@ Reversed Array: 5, 4, 3, 2, 1
 2. **In-Place Reversal**:
    - Efficiently manipulates memory without using extra space.
 
-3. **32-bit Constraints**:
+3. **64-bit Constraints**:
    - The program strictly adheres to 64-bit architecture, utilizing Linux syscalls and 64-bit registers for processing.
