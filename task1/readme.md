@@ -36,12 +36,12 @@ This program demonstrates how to classify a user-entered integer as **"POSITIVE"
 
 3. Link the object file to create an executable:
    ```bash
-   ld -o control_flow control_flow.o
+   ld -o task1 task1.o
    ```
 
 4. Run the program:
    ```bash
-   ./control_flow
+   ./task1
    ```
 
 ---
